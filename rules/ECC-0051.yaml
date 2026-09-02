@@ -1,0 +1,31 @@
+id: ECC-0051
+status: active
+since: "0.1.0"
+level: CONSIDER
+area: QUA
+applies_to: [large-repo]
+
+title: Sessions have a context-reset discipline
+
+requirement: |-
+  Long-running sessions are cleared or compacted at a deliberate point, rather
+  than run indefinitely until they are abandoned.
+
+failure_mode: |-
+  A session left open for days carries its entire history into every subsequent
+  request. Cached reads make this cheap per token but not free, and it is
+  multiplied by every remaining turn — a session at a very large context pays
+  that on every turn until it ends. It also degrades quality: abandoned
+  approaches, superseded file contents and resolved dead ends stay in context
+  and compete with the current task.
+
+discharges: [CANON-THINK-006]
+check: checks/ecc_0051_session_discipline.py
+signals:
+  - session wall-clock duration distribution
+  - mean cache-read tokens per API call
+  - turns per session against a threshold
+remediation: |-
+  Clear between unrelated tasks. The signal to watch is mean cache-read tokens
+  per API call, which /analyze-claude-usage reports — if it is climbing across
+  sessions, the reset discipline has lapsed.

@@ -1,0 +1,32 @@
+id: ECC-0001
+status: active
+since: "0.1.0"
+level: MUST
+area: CTX
+applies_to: [any-repo]
+
+title: The repo has a CLAUDE.md
+
+requirement: |-
+  Every repo an agent works in carries a CLAUDE.md at its root, stating what the
+  project is, how to build/test/run it, and the conventions a newcomer would
+  otherwise violate. It records what is not derivable from reading the code.
+
+failure_mode: |-
+  Without it the agent rediscovers the build command, the test runner and the
+  layout on every session, spending input tokens on exploration that a
+  twenty-line file would have answered. Worse, it guesses — inventing a test
+  command that does not exist, or writing code in a style the repo abandoned two
+  years ago. The cost is invisible because it shows up as ordinary token spend
+  rather than as an error.
+
+discharges: [CANON-ARCH-014]
+check: checks/ecc_0001_claude_md_present.py
+signals:
+  - CLAUDE.md exists at repo root (or .claude/CLAUDE.md)
+remediation: |-
+  Run /init to generate a first draft from the codebase, then cut it down. A
+  CLAUDE.md that is mostly restating the directory tree is worse than a short
+  one that states the three things the agent keeps getting wrong.
+references:
+  - https://code.claude.com/docs/en/memory

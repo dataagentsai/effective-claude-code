@@ -1,0 +1,23 @@
+{
+  "name": "effective-claude-code",
+  "version": "0.1.0",
+  "description": "Audit a codebase's Claude Code setup, analyze token/cost usage and hallucination-proxy signals, and find reusable skills worth installing.",
+  "author": {
+    "name": "dataagentsai"
+  },
+  "homepage": "https://github.com/dataagentsai/effective-claude-code",
+  "repository": "https://github.com/dataagentsai/effective-claude-code",
+  "license": "See LICENSE and LICENSE-SPEC.txt",
+  "keywords": [
+    "audit",
+    "analytics",
+    "cost",
+    "tokens",
+    "permissions",
+    "large-codebase",
+    "observability"
+  ],
+  "skills": "./skills",
+  "commands": "./commands",
+  "agents": "./agents"
+}

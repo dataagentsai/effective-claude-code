@@ -1,0 +1,31 @@
+id: ECC-0003
+status: active
+since: "0.1.0"
+level: MUST
+area: CTX
+applies_to: [large-repo, monorepo]
+
+title: Generated and vendored directories are excluded from the search surface
+
+requirement: |-
+  Build output, dependency trees, lockfiles, minified bundles, snapshots and
+  fixtures are excluded from agent search — via .gitignore where they are also
+  untracked, and explicitly where they are tracked.
+
+failure_mode: |-
+  A grep for a symbol name returns four hundred hits from node_modules, dist/
+  and a vendored copy of the same library. The agent reads the vendored copy,
+  edits it, and the change disappears on the next build. In a large repo this is
+  the single most common cause of confident edits to the wrong file, and it also
+  inflates every search result the agent has to read through.
+
+discharges: [CANON-ARCH-021]
+check: checks/ecc_0003_search_surface.py
+signals:
+  - tracked files under known generated paths (dist/, build/, target/, node_modules/, vendor/)
+  - presence of large minified or lockfile artefacts in tracked history
+remediation: |-
+  Untrack what should not be tracked. For generated code that must stay tracked
+  (protobuf output, migrations), say so explicitly in CLAUDE.md — "never edit
+  these by hand, regenerate with X" — because exclusion alone will not stop the
+  agent reading them, only stop it prioritising them.

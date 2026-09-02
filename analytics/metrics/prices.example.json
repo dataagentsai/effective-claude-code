@@ -1,0 +1,9 @@
+{
+  "_comment": "USD per MILLION tokens. There are deliberately no real numbers here. Rates differ by model, plan and service tier, and they change. Copy this file, fill it from the rate card you are actually billed against, and pass it with --prices. A number committed to this repo would be wrong within a quarter and wrong silently.",
+  "_source": "https://platform.claude.com/ -- your own billing page is authoritative",
+  "_model": "REPLACE-ME",
+  "input": null,
+  "output": null,
+  "cache_read": null,
+  "cache_write": null
+}

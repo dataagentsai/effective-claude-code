@@ -1,0 +1,32 @@
+{
+  "$comment": "This repo's own configuration, and the worked example for its own rules. ECC-0010: deny first, ask for the irreversible, allow only what is read-only or trivially reversible. ECC-0021: retention set deliberately rather than left at the 30-day default.",
+  "cleanupPeriodDays": 180,
+  "permissions": {
+    "deny": [
+      "Read(**/.env*)",
+      "Read(**/*.pem)",
+      "Read(**/id_rsa*)",
+      "Read(**/.aws/credentials)",
+      "Read(**/.claude/.credentials.json)",
+      "Read(evidence/**)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -fd*)",
+      "Bash(curl * | sh)",
+      "Bash(curl * | bash)"
+    ],
+    "ask": [
+      "Bash(git push*)",
+      "Bash(git commit*)",
+      "Bash(rm *)"
+    ],
+    "allow": [
+      "Bash(python tools/*)",
+      "Bash(python analytics/collectors/*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add *)"
+    ]
+  }
+}

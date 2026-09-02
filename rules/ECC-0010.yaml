@@ -1,0 +1,33 @@
+id: ECC-0010
+status: active
+since: "0.1.0"
+level: MUST
+area: PERM
+applies_to: [any-repo]
+
+title: Permission configuration has a deny tier
+
+requirement: |-
+  Permission settings define what is forbidden, not only what is allowed. At
+  minimum: secrets and credential files, history-rewriting git operations, and
+  any command that publishes outward without review.
+
+failure_mode: |-
+  An allow-only configuration encodes convenience and nothing else. It grows one
+  entry at a time, each added under time pressure to stop a prompt, and nobody
+  ever removes one. The result reads as a policy but expresses no policy — there
+  is no statement anywhere of what the agent must never do, so the only control
+  left is whether a human happens to be watching the specific turn where it
+  matters.
+
+discharges: [CANON-SEC-002]
+check: checks/ecc_0010_deny_tier.py
+signals:
+  - count of allow / ask / deny rules in each settings file
+  - whether any deny rule covers credential paths or history rewriting
+remediation: |-
+  Start with deny rules for .env, credential stores, `git push --force`,
+  `git reset --hard`, and outbound publish commands. Use `ask` rather than
+  `allow` for anything irreversible but legitimate.
+references:
+  - https://code.claude.com/docs/en/permissions

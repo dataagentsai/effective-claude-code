@@ -1,0 +1,25 @@
+id: reg-claude-code-otel
+name: Claude Code OpenTelemetry export
+source: https://code.claude.com/docs/en/monitoring-usage
+trust: official
+category: observability
+last_reviewed: "2026-09-02"
+what_it_does: |-
+  First-party telemetry. Set CLAUDE_CODE_ENABLE_TELEMETRY=1 with an OTLP metrics
+  and/or logs exporter to emit claude_code.token.usage, claude_code.cost.usage,
+  claude_code.active_time.total, claude_code.session.count and per-event logs
+  (user_prompt, api_request, tool_result, tool_decision, api_error, and others).
+
+why_you_would_use_it: |-
+  It is the only source of timing. Turn wall-clock duration
+  (interaction.duration_ms) and time to first token (ttft_ms) exist here and
+  nowhere in the local transcripts. It is also the only way to aggregate across
+  a team without a managed dashboard.
+
+notes: |-
+  Off by default. Content logging (OTEL_LOG_USER_PROMPTS,
+  OTEL_LOG_ASSISTANT_RESPONSES, OTEL_LOG_RAW_API_BODIES) is separately opt-in and
+  sends prompt and response text to your collector -- treat enabling it as a data
+  handling decision, not a verbosity setting.
+
+  See ECC-0020. Collector config lives in analytics/collectors/otel/.

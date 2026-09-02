@@ -1,0 +1,28 @@
+id: ECC-0012
+status: active
+since: "0.1.0"
+level: SHOULD
+area: PERM
+applies_to: [team, monorepo]
+
+title: Project-scoped permissions live in project settings, not user settings
+
+requirement: |-
+  Permissions that exist because of one project's toolchain belong in that
+  project's .claude/settings.json, committed. User-level settings hold only what
+  is true across every project the person works on.
+
+failure_mode: |-
+  Project-specific entries accumulated in a user-level file follow the developer
+  everywhere, quietly granting one project's permissions inside another. They
+  also cannot be reviewed by the team who owns the project, and each new joiner
+  rebuilds the same list by hand over their first fortnight.
+
+discharges: [CANON-ARCH-021, CANON-SEC-002]
+check: checks/ecc_0012_permission_scope.py
+signals:
+  - user-level allow entries naming a path or command specific to one project
+  - whether the project has a committed .claude/settings.json at all
+remediation: |-
+  Move project-specific entries into the project and commit them. Keep
+  settings.local.json for genuinely personal overrides, and keep it gitignored.

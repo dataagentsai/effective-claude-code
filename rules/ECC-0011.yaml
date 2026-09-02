@@ -1,0 +1,31 @@
+id: ECC-0011
+status: active
+since: "0.1.0"
+level: SHOULD
+area: PERM
+applies_to: [any-repo]
+
+title: The allowlist is free of duplicates and shadowed rules
+
+requirement: |-
+  No exact duplicate entries, and no entry made unreachable by a broader one
+  earlier in the list. The allowlist stays small enough that a person can read
+  it in one sitting and say what it permits.
+
+failure_mode: |-
+  An allowlist that has grown past a few hundred entries can no longer be
+  reviewed, so it is never reviewed. Duplicates and shadowing are the visible
+  symptom; the real problem is that a broad wildcard added months ago silently
+  permits far more than anyone believes, and nobody notices because the specific
+  entries around it look reassuringly narrow.
+
+discharges: [CANON-SEC-002]
+check: checks/ecc_0011_allowlist_hygiene.py
+signals:
+  - exact duplicate entries within and across settings files
+  - entries shadowed by a broader wildcard
+  - total entry count against a reviewability threshold
+remediation: |-
+  Run /tune-permissions. It clusters entries by tool and prefix, proposes
+  wildcards that cover a cluster, and separates the ones that should have been
+  `ask` or `deny` all along.

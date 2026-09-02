@@ -1,0 +1,25 @@
+id: reg-claude-code-analytics-dashboards
+name: Claude Code analytics dashboards and APIs
+source: https://code.claude.com/docs/en/analytics
+trust: official
+category: observability
+last_reviewed: "2026-09-02"
+what_it_does: |-
+  Managed org-level dashboards. Team and Enterprise plans get
+  claude.ai/analytics/claude-code (adoption, sessions, suggestion accept rate,
+  and -- with the GitHub app installed -- PR and lines-of-code contribution
+  metrics plus CSV export). API customers get platform.claude.com/claude-code
+  (usage, spend, per-user team insights).
+
+why_you_would_use_it: |-
+  Adoption and contribution measurement across an organisation, which neither
+  local transcripts nor a self-hosted collector can produce.
+
+notes: |-
+  Requires admin access. Contribution metrics are unavailable under Zero Data
+  Retention, and not available to API customers at all. Attribution is
+  deliberately conservative -- it undercounts, and the docs say so, which matters
+  if the numbers are being used to argue ROI.
+
+  Programmatic access: the Enterprise Analytics API needs a key with
+  read:analytics scope; the Console Claude Code Analytics API needs an Admin key.

@@ -1,0 +1,21 @@
+# Local audit output. NEVER commit — transcripts and usage reports contain
+# file paths, repo names, prompts and client identifiers.
+evidence/*
+!evidence/.gitkeep
+!evidence/README.md
+!evidence/samples/
+*.report.json
+*.report.html
+*.usage.json
+
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/

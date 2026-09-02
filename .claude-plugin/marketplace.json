@@ -1,0 +1,20 @@
+{
+  "name": "dataagentsai",
+  "owner": {
+    "name": "dataagentsai",
+    "url": "https://github.com/dataagentsai"
+  },
+  "metadata": {
+    "description": "Concrete tooling for working effectively with Claude Code.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "effective-claude-code",
+      "source": "./",
+      "description": "Audit a codebase's Claude Code setup, analyze token/cost usage and hallucination-proxy signals, and find reusable skills worth installing.",
+      "version": "0.1.0",
+      "category": "developer-tools"
+    }
+  ]
+}

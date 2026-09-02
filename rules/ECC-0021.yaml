@@ -1,0 +1,30 @@
+id: ECC-0021
+status: active
+since: "0.1.0"
+level: MUST
+area: OBS
+applies_to: [any-repo]
+
+title: Transcript retention is set deliberately
+
+requirement: |-
+  cleanupPeriodDays is set explicitly, to a value the team has chosen, rather
+  than left at the default.
+
+failure_mode: |-
+  Local session transcripts are deleted after 30 days by default. The loss is
+  silent and unrecoverable: the first time anyone wants a six-month trend, or
+  wants to compare this quarter's cost per feature against last quarter's, the
+  data required to answer has already been erased. This is the one setting that
+  must be changed before you need it, because changing it afterwards recovers
+  nothing.
+
+discharges: [CANON-OBS-001, CANON-DATA-009]
+check: checks/ecc_0021_retention_set.py
+signals:
+  - cleanupPeriodDays present in any settings file
+  - age of the oldest surviving transcript versus the configured window
+remediation: |-
+  Set "cleanupPeriodDays" in ~/.claude/settings.json. If disk is the concern,
+  archive transcripts out to cold storage on a schedule instead of shortening
+  the window — they compress extremely well.

@@ -1,0 +1,30 @@
+id: ECC-0032
+status: active
+since: "0.1.0"
+level: CONSIDER
+area: ART
+applies_to: [team]
+
+title: Shared setup is distributed as a plugin, not as dotfiles
+
+requirement: |-
+  Once more than one repo or more than one person needs the same skills, agents
+  and hooks, bundle them into a versioned plugin served from a marketplace,
+  rather than copying directories between machines.
+
+failure_mode: |-
+  Copied setup has no version, so nobody can say which variant a given developer
+  is running, and a fix cannot be rolled out — it can only be re-announced.
+  Copies also cannot be un-shipped: a skill later found to be harmful stays on
+  every machine that took it.
+
+discharges: [CANON-DLV-007]
+check: null
+review_question: |-
+  If we found a bug in a shared skill today, could we identify who is running
+  the affected version and ship them a fix, without asking them to copy files?
+remediation: |-
+  This repo is itself the worked example — the root is a plugin with a
+  marketplace manifest alongside it.
+references:
+  - https://code.claude.com/docs/en/plugins

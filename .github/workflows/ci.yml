@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Rules parse and conform to the schema
+        run: python tools/lint_rules.py
+
+      - name: Self-audit
+        # The repo audits itself. If our own setup fails a MUST rule we have no
+        # business shipping the rule.
+        run: python tools/audit.py --repo . --team
+
+      - name: Analyzers import and run against an empty transcript root
+        env:
+          CLAUDE_CONFIG_DIR: /tmp/no-such-config
+        run: |
+          python analytics/collectors/usage_report.py || test $? -eq 2
+          python analytics/collectors/quality_signals.py || test $? -eq 2

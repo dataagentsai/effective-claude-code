@@ -1,0 +1,28 @@
+id: ECC-0040
+status: active
+since: "0.1.0"
+level: MUST
+area: SUP
+applies_to: [any-repo, team]
+
+title: Third-party skills and plugins carry a trust tier and a review date
+
+requirement: |-
+  Every externally-sourced skill, agent, hook or MCP server in use is recorded
+  with its source, licence, trust tier and the date a person last read it.
+
+failure_mode: |-
+  Community skill bundles ship hundreds of files at once, and installing one is
+  a supply-chain decision presented as a convenience. Skills alter how the agent
+  behaves and hooks execute arbitrary commands on your machine, so an
+  unreviewed bundle is unreviewed code with your credentials. Nobody notices
+  because nothing appears to run — it only changes what the agent does.
+
+discharges: [CANON-SEC-014]
+check: checks/ecc_0040_registry_coverage.py
+signals:
+  - installed plugins and skills not present in registry/
+  - registry entries whose last_reviewed date is stale
+remediation: |-
+  Add an entry to registry/ before installing. Prefer pointing at a source and
+  vendoring only what you actually depend on, over installing a bundle whole.

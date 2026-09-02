@@ -1,0 +1,24 @@
+id: reg-ccusage
+name: ccusage
+source: https://ccusage.com/
+repo: https://github.com/ryoppippi/ccusage
+trust: unvetted
+category: analytics
+install: npx ccusage@latest
+licence: MIT
+what_it_does: |-
+  Parses the same local JSONL transcripts this repo reads, and prints daily,
+  monthly, per-session and five-hour-block cost reports with per-model and
+  cache-token breakdowns. Filters by date, project and model; exports JSON;
+  ships an MCP server so an agent can check its own usage mid-session.
+
+why_you_would_use_it: |-
+  It maintains a price table, which this repo deliberately does not. If you want
+  dollar figures rather than token counts, use ccusage for the costing and this
+  repo's analyzers for the setup-quality signals it does not cover.
+
+overlaps_with: [analytics/collectors/usage_report.py]
+notes: |-
+  Runs locally with no API key and no network call. Widely used -- around 16.5k
+  GitHub stars as of 2026-09. Nobody here has read the source; tier stays
+  unvetted until someone does.

@@ -1,0 +1,15 @@
+id: reg-claude-usage-dashboard
+name: claude-usage
+source: https://github.com/phuryn/claude-usage
+trust: unvetted
+category: analytics
+what_it_does: |-
+  A local web dashboard over Claude Code token usage, cost and session history,
+  including a quota progress bar for subscription plans.
+
+why_you_would_use_it: |-
+  Where ccusage and this repo produce terminal reports, this produces a browsing
+  UI. Useful if the audience for the numbers is not the person who ran them.
+
+overlaps_with: [analytics/collectors/usage_report.py]
+notes: Nobody here has read the source.

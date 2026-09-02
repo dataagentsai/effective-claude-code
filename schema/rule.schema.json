@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dataagentsai.github.io/effective-claude-code/schema/rule.schema.json",
+  "title": "ECC rule",
+  "description": "One normative statement about a Claude Code setup. Declarative; the executable form lives in checks/.",
+  "type": "object",
+  "required": ["id", "status", "since", "level", "area", "applies_to", "title", "requirement", "failure_mode"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^ECC-[0-9]{4}$" },
+    "status": { "enum": ["active", "draft", "deprecated"] },
+    "since": { "type": "string" },
+    "level": {
+      "enum": ["MUST", "SHOULD", "CONSIDER"],
+      "description": "MUST failures fail an audit. SHOULD are reported and scored. CONSIDER are advisory only."
+    },
+    "area": {
+      "enum": ["CTX", "PERM", "OBS", "ART", "SUP", "QUA"],
+      "description": "CTX context/memory, PERM permissions/safety, OBS telemetry, ART artefacts, SUP supply chain, QUA output quality"
+    },
+    "applies_to": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "enum": ["any-repo", "large-repo", "team", "solo", "monorepo", "public-repo"] }
+    },
+    "title": { "type": "string", "maxLength": 120 },
+    "requirement": { "type": "string" },
+    "failure_mode": { "type": "string", "description": "What goes wrong in practice when this is not met. Concrete, not abstract." },
+    "discharges": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^CANON-[A-Z]+-[0-9]{3}$" },
+      "description": "Canon principle ids this rule makes concrete. One-directional ECC -> CANON."
+    },
+    "check": {
+      "type": ["string", "null"],
+      "description": "Path to the executable check. null means not automatable; use review_question instead."
+    },
+    "review_question": { "type": "string", "description": "Required when check is null." },
+    "signals": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "What the check actually inspects, in plain language."
+    },
+    "remediation": { "type": "string" },
+    "references": { "type": "array", "items": { "type": "string", "format": "uri" } }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "check": { "const": null } }, "required": ["check"] },
+      "then": { "required": ["review_question"] }
+    }
+  ]
+}

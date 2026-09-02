@@ -1,0 +1,32 @@
+id: ECC-0050
+status: active
+since: "0.1.0"
+level: SHOULD
+area: QUA
+applies_to: [team]
+
+title: A hallucination-proxy index is tracked over time
+
+requirement: |-
+  The team tracks the derived error signals available from transcripts — reads
+  and edits against paths that do not exist, edit string-match failures, refusal
+  stops, and user-correction turns — as a trend, not as individual incidents.
+
+failure_mode: |-
+  Without a trend, quality is assessed by whoever complained most recently. A
+  CLAUDE.md change or a model switch that made things measurably worse is
+  invisible, because the only evidence is a handful of frustrating sessions that
+  nobody logged. The signals needed to see it are already sitting in the
+  transcripts and simply go unread.
+
+discharges: [CANON-OBS-004, CANON-AI-008]
+check: checks/ecc_0050_quality_index.py
+signals:
+  - tool errors indicating a nonexistent path was invented
+  - Edit old_string match failures
+  - stop_reason refusal
+  - user turns that immediately correct the previous assistant turn
+remediation: |-
+  Run /trace-hallucinations. Read the caveat in analytics/metrics/ first: these
+  are proxies, and a rising index is a prompt to investigate rather than a
+  measurement of truthfulness.

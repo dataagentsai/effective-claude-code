@@ -1,0 +1,31 @@
+id: ECC-0031
+status: active
+since: "0.1.0"
+level: SHOULD
+area: ART
+applies_to: [any-repo]
+
+title: Deterministic gates are hooks, not instructions
+
+requirement: |-
+  Anything that must happen every time — formatting, linting, running tests
+  before a commit, blocking edits to generated files — is a hook. Instructions
+  in CLAUDE.md are for judgement, not for guarantees.
+
+failure_mode: |-
+  "Always run the formatter after editing" in CLAUDE.md is a request, and it is
+  followed most of the time, which is the worst possible failure rate: frequent
+  enough that the team believes it is enforced, rare enough in its misses that
+  the misses are never attributed to the mechanism. A hook is executed by the
+  harness and does not depend on the model attending to it.
+
+discharges: [CANON-ARCH-003, CANON-TEST-011]
+check: checks/ecc_0031_gates_are_hooks.py
+signals:
+  - imperative always/never instructions in CLAUDE.md that name a shell command
+  - whether a hooks block exists in settings
+remediation: |-
+  Move the instruction into a PostToolUse or PreToolUse hook. Keep the CLAUDE.md
+  line only if it explains *why*, and say that the hook enforces it.
+references:
+  - https://code.claude.com/docs/en/hooks

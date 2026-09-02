@@ -1,0 +1,25 @@
+id: reg-community-skill-bundles
+name: Large community skill and agent bundles
+source: https://github.com/rohitg00/awesome-claude-code-toolkit
+also:
+  - https://github.com/alirezarezvani/claude-skills
+  - https://github.com/GetBindu/awesome-claude-code-and-skills
+trust: unvetted
+category: skills
+what_it_does: |-
+  Aggregated collections shipping hundreds of skills, agents, commands, hooks
+  and MCP configurations in one installable bundle. Useful mainly as a source of
+  ideas and as a survey of what people are building.
+
+why_you_would_use_it: |-
+  To find a pattern worth copying. Read the one skill you want and vendor that
+  file. There is rarely a good reason to install a bundle whole.
+
+notes: |-
+  Listed for discovery, explicitly NOT recommended for installation. These
+  bundles configure hooks, which run shell commands automatically without a
+  permission prompt. Installing several hundred unread files that can execute on
+  your machine is a supply-chain decision, and the convenience framing hides
+  that (ECC-0040, ECC-0041).
+
+  Extract, read, vendor. Do not install.

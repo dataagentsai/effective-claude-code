@@ -1,0 +1,30 @@
+id: ECC-0030
+status: active
+since: "0.1.0"
+level: SHOULD
+area: ART
+applies_to: [any-repo]
+
+title: A repeated multi-step workflow is a skill, not a pasted prompt
+
+requirement: |-
+  Any procedure a person has pasted into Claude Code more than about three times
+  becomes a skill under .claude/skills/, committed to the repo.
+
+failure_mode: |-
+  A pasted prompt is a private, unversioned, undiffable copy of a procedure. Two
+  developers' copies drift within a fortnight, neither knows the other's has
+  changed, and the improvements one of them discovered are never shared. When
+  the procedure turns out to have been subtly wrong, there is no single place to
+  fix it and no way to find who is still running the old one.
+
+discharges: [CANON-ARCH-003, CANON-DLV-007]
+check: checks/ecc_0030_skills_present.py
+signals:
+  - repeated near-identical prompts across transcripts
+  - whether .claude/skills/ exists and is committed
+remediation: |-
+  Extract the prompt into .claude/skills/<name>/SKILL.md with a description that
+  states when it applies. Commit it. Distribution across repos is a plugin.
+references:
+  - https://code.claude.com/docs/en/skills

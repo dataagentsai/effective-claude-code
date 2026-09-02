@@ -1,0 +1,33 @@
+id: ECC-0020
+status: active
+since: "0.1.0"
+level: MUST
+area: OBS
+applies_to: [team]
+
+title: Telemetry export is enabled once more than one developer is using Claude Code
+
+requirement: |-
+  A team sets CLAUDE_CODE_ENABLE_TELEMETRY=1 with an OTLP metrics and logs
+  exporter pointed at its own collector.
+
+failure_mode: |-
+  Without it the only usage data is each developer's own local transcripts,
+  which expire and which nobody aggregates. The team cannot answer whether spend
+  is rising, which workflows are expensive, or whether a change to CLAUDE.md
+  helped — so decisions about how to use the tool get made from anecdote. Local
+  transcripts also carry no timing: turn duration and time-to-first-token exist
+  only in the telemetry stream.
+
+discharges: [CANON-OBS-001]
+check: checks/ecc_0020_telemetry_enabled.py
+signals:
+  - CLAUDE_CODE_ENABLE_TELEMETRY in settings env block or process environment
+  - an OTEL_METRICS_EXPORTER or OTEL_LOGS_EXPORTER set to something other than none
+remediation: |-
+  See analytics/collectors/otel/. Metrics of interest are
+  claude_code.token.usage, claude_code.cost.usage and
+  claude_code.active_time.total; the span attributes interaction.duration_ms and
+  ttft_ms are the ones with no local equivalent.
+references:
+  - https://code.claude.com/docs/en/monitoring-usage

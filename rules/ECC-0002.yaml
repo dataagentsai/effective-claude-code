@@ -1,0 +1,29 @@
+id: ECC-0002
+status: active
+since: "0.1.0"
+level: SHOULD
+area: CTX
+applies_to: [any-repo]
+
+title: CLAUDE.md stays inside a size budget
+
+requirement: |-
+  Root CLAUDE.md stays under roughly 300 lines / 12 KB. Detail that only matters
+  for one subsystem moves to a nested CLAUDE.md in that subsystem's directory,
+  which loads only when the agent works there.
+
+failure_mode: |-
+  CLAUDE.md is prepended to every single request in the session. A 60 KB
+  CLAUDE.md is not a one-off cost, it is a per-turn tax multiplied by every turn
+  of every session by every developer. It also dilutes: the more instructions
+  compete for attention, the less reliably any individual one is followed, so
+  the file grows in a loop where each ignored instruction prompts another.
+
+discharges: [CANON-ARCH-014, CANON-THINK-006]
+check: checks/ecc_0002_claude_md_budget.py
+signals:
+  - byte size and line count of every CLAUDE.md found
+  - whether a large root file could be split along existing directory boundaries
+remediation: |-
+  Split by ownership boundary, not by topic. Each nested CLAUDE.md should be
+  readable by someone who owns only that directory.

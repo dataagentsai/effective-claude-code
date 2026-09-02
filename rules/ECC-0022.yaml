@@ -1,0 +1,29 @@
+id: ECC-0022
+status: active
+since: "0.1.0"
+level: SHOULD
+area: OBS
+applies_to: [team]
+
+title: A usage baseline exists before any optimisation is claimed
+
+requirement: |-
+  Before changing CLAUDE.md, permissions, model selection or workflow in the
+  name of efficiency, capture a baseline: tokens by type, cache read/write
+  ratio, API calls per prompt, tool calls per prompt, and session duration.
+
+failure_mode: |-
+  Optimisation without a baseline produces confident claims that cannot be
+  checked, and it reliably targets the wrong thing. Output tokens feel expensive
+  because they are what you watch being generated, but in a cached agentic
+  session they are routinely a small fraction of the bill next to cache reads.
+  Teams trim prompts, feel efficient, and move nothing.
+
+discharges: [CANON-OBS-004, CANON-THINK-002]
+check: checks/ecc_0022_baseline_exists.py
+signals:
+  - presence of a stored baseline under evidence/
+  - whether the baseline is older than the configured retention window
+remediation: |-
+  Run /analyze-claude-usage and commit the summary (not the raw transcripts) to
+  evidence/. Re-run after each change and compare.
