@@ -1,0 +1,125 @@
+# Failure modes -- what goes wrong, what observable detects it, what fixes it.
+#
+# This is the diagnosis half of the graph. It turns a number the analyzers
+# produce into a specific thing to change, which is the difference between
+# an analytics tool and a useful one.
+
+id: FM-01
+label: Invented path
+description: >-
+  A file path is produced from pattern rather than from having looked. Reads and
+  edits land on files that do not exist.
+detected_by: [invented_path, rework_loop]
+substrate: transcript
+mitigated_by: [ECC-0001, ECC-0003, ECC-0033]
+capabilities: [CAP-101, CAP-102, CAP-110]
+note: >-
+  The usual reflex is to write a better CLAUDE.md. Often the real fix is a
+  language server, which replaces guessing with looking.
+
+---
+
+id: FM-02
+label: Edit mismatch
+description: Code is reconstructed from memory inaccurately, so old_string does not match.
+detected_by: [edit_mismatch, unread_edit]
+substrate: transcript
+mitigated_by: [ECC-0033]
+capabilities: [CAP-101]
+
+---
+
+id: FM-03
+label: Context bloat
+description: >-
+  The conversation re-sent on every turn grows without bound. Cached reads make
+  it cheap per token but not free, multiplied by every remaining turn.
+detected_by: [mean_context_per_call, session_duration, cache_ratio]
+substrate: transcript
+mitigated_by: [ECC-0002, ECC-0051, ECC-0043]
+capabilities: [CAP-181, CAP-186, CAP-188]
+
+---
+
+id: FM-04
+label: Permission fatigue
+description: >-
+  An allowlist grown one entry at a time under time pressure, never reviewed,
+  with no statement anywhere of what must never happen.
+detected_by: [allow_rule_count, duplicate_rules, shadowed_rules]
+substrate: settings
+mitigated_by: [ECC-0010, ECC-0011, ECC-0012]
+capabilities: [CAP-153, CAP-183]
+
+---
+
+id: FM-05
+label: Drifted procedure
+description: >-
+  A workflow lives as a pasted prompt in several people's scratch files. Copies
+  diverge; improvements are never shared; there is no single place to fix it.
+detected_by: [repeated_prompt_similarity]
+substrate: transcript
+mitigated_by: [ECC-0030, ECC-0032]
+capabilities: [CAP-112, CAP-152, CAP-162]
+
+---
+
+id: FM-06
+label: Unreviewed supply chain
+description: >-
+  Skills change agent behaviour and hooks execute shell commands without a
+  prompt. An unread bundle is unread code running with your credentials.
+detected_by: [registry_coverage, unpinned_source]
+substrate: settings
+mitigated_by: [ECC-0040, ECC-0041, ECC-0042]
+capabilities: [CAP-185]
+
+---
+
+id: FM-07
+label: Silent pass
+description: >-
+  A check that could not inspect what it needed reports success. The audit is
+  believed precisely because it looks clean.
+detected_by: [not_evaluated_count]
+substrate: audit
+mitigated_by: [ECC-0022]
+capabilities: [CAP-180]
+note: Structurally prevented here -- NOT_EVALUATED is a first-class verdict.
+
+---
+
+id: FM-08
+label: Plugin tax
+description: >-
+  Installed plugins cost context on every turn and startup time on every
+  session, including ones nobody has invoked in weeks.
+detected_by: [plugin_context_cost, plugin_last_used]
+substrate: settings
+mitigated_by: [ECC-0043]
+capabilities: [CAP-184]
+
+---
+
+id: FM-09
+label: Unenforced instruction
+description: >-
+  A deterministic rule written as an instruction is followed most of the time --
+  frequent enough to be believed, rare enough in its misses to hide them.
+detected_by: [imperative_without_hook]
+substrate: repo
+mitigated_by: [ECC-0031]
+capabilities: [CAP-120, CAP-121, CAP-130, CAP-133]
+
+---
+
+id: FM-10
+label: Lost history
+description: >-
+  Transcripts expire on a default nobody chose, so the first longitudinal
+  question asked is unanswerable.
+detected_by: [retention_setting, oldest_transcript_age]
+substrate: settings
+mitigated_by: [ECC-0021]
+capabilities: [CAP-186, CAP-188]

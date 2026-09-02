@@ -17,6 +17,10 @@ jobs:
       - name: Rules parse and conform to the schema
         run: python tools/lint_rules.py
 
+      - name: Ontology references resolve
+        # Exits non-zero on a dangling capability, failure-mode or rule id.
+        run: python tools/coverage.py
+
       - name: Self-audit
         # The repo audits itself. If our own setup fails a MUST rule we have no
         # business shipping the rule.

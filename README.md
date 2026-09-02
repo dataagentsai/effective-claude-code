@@ -50,6 +50,7 @@ agents/             subagent presets (large-codebase explorer, …)
 hooks/              reference hooks — format / lint / test gates
 rules/              NORMATIVE. One YAML per rule, ECC-nnnn, canon-shaped
 checks/             executable counterpart, 1:1 with rules/
+ontology/           activities · capabilities · failure modes, as a queryable graph
 profiles/           per-stack presets (pyspark-databricks, nextjs, fastapi, …)
 playbooks/          narrative: large-codebase, onboarding, multi-dev, cost-control
 analytics/          collectors/ · metrics/ · reports/

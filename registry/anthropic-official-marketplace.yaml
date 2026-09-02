@@ -1,0 +1,53 @@
+id: reg-anthropic-official-marketplace
+name: claude-plugins-official
+source: https://code.claude.com/docs/en/discover-plugins
+catalog: https://claude.com/plugins
+trust: official
+category: marketplace
+last_reviewed: "2026-09-02"
+install: "auto-registered; if blocked, /plugin marketplace add anthropics/claude-plugins-official"
+
+what_it_does: |-
+  Anthropic's curated marketplace, registered automatically on first interactive
+  start. Inclusion is at Anthropic's discretion; the public submission forms feed
+  the community marketplace, not this one.
+
+  Code intelligence -- language servers giving Claude diagnostics after every
+  edit and real symbol navigation. Eleven languages: clangd, csharp-ls, gopls,
+  jdtls, kotlin, lua, php, pyright, rust-analyzer, swift, typescript. The plugin
+  configures the connection; you install the binary.
+
+  External integrations -- pre-configured MCP servers. Source control: github,
+  gitlab. Project management: atlassian, asana, linear, notion. Design: figma.
+  Infrastructure: vercel, firebase, supabase. Communication: slack.
+  Monitoring: sentry.
+
+  Development workflows -- commit-commands (commit, push, PR), pr-review-toolkit
+  (specialised review agents), agent-sdk-dev, plugin-dev.
+
+  Security -- security-guidance reviews each change as Claude writes it and fixes
+  what it finds in the same session. Accepts project-specific rules.
+
+  Output styles -- explanatory-output-style, learning-output-style.
+
+why_you_would_use_it: |-
+  This is the reuse half of the build-versus-reuse line. Everything here crosses
+  a tool boundary -- a language protocol, a vendor API -- and is maintained
+  against something that changes without us. Rebuilding any of it is liability
+  with no upside.
+
+  The single highest-leverage install is a language server for the repo's main
+  language: it converts navigation-by-guess into navigation-by-lookup, which is
+  where invented paths come from. See ECC-0033.
+
+covers: [CAP-101, CAP-102, CAP-132, CAP-141, CAP-150, CAP-151, CAP-154, CAP-160, CAP-161, CAP-170, CAP-171]
+
+notes: |-
+  Official does not mean cost-free. Every enabled plugin announces its tools and
+  skills in the context of every turn, and the Discover tab shows a per-plugin
+  context-cost estimate before you install. Install against actual use and review
+  the portfolio -- ECC-0043.
+
+  Language servers can be memory-hungry on large repositories (rust-analyzer,
+  pyright especially), and in cloud sessions Claude Code does not start plugin
+  language servers at all, so the LSP tool is unavailable there.

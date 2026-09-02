@@ -23,3 +23,7 @@ notes: |-
   that (ECC-0040, ECC-0041).
 
   Extract, read, vendor. Do not install.
+
+  Check claude-community first (see reg-claude-community-marketplace). If what
+  you want is there, take it from there instead: same convenience, but pinned to
+  a screened commit rather than to whatever is on a branch today (ECC-0042).

@@ -1,0 +1,371 @@
+# Capabilities -- what a setup can DO, stated independently of what supplies it.
+#
+# source:  anthropic-official | claude-community | third-party | own
+# status:  install | built | partial | gap
+#
+# The rule: reuse capability, build governance. Anything crossing a tool
+# boundary is someone else's to maintain. Anything about whether OUR setup is
+# correct and measurable is ours.
+
+id: CAP-101
+label: Diagnostics after every edit
+kind: lsp-server
+source: anthropic-official
+supplier: "pyright-lsp / typescript-lsp / rust-analyzer-lsp / gopls-lsp (11 languages)"
+status: install
+note: >-
+  The language server reports type errors and missing imports straight back
+  after each edit, so a mistake is caught in the same turn rather than at the
+  next build. Highest-leverage single install for a typed codebase, and it
+  attacks the two signals our own quality scanner counts.
+addresses: [FM-01, FM-02]
+
+---
+
+id: CAP-102
+label: Code navigation by symbol
+kind: lsp-server
+source: anthropic-official
+supplier: "the same LSP plugins"
+status: install
+note: >-
+  Jump to definition, find references, call hierarchy. More precise than
+  grep-based search, and the precision is what stops paths being guessed.
+addresses: [FM-01]
+
+---
+
+id: CAP-110
+label: Project context that survives the session
+kind: claude-md
+source: own
+status: built
+note: Build and test commands, layout, the conventions a newcomer would violate.
+addresses: [FM-01, FM-05]
+
+---
+
+id: CAP-111
+label: Clean search surface
+kind: settings
+source: own
+status: built
+note: Generated and vendored directories kept out of what the agent searches.
+addresses: [FM-01]
+
+---
+
+id: CAP-112
+label: House conventions applied automatically
+kind: skill
+source: own
+status: gap
+note: >-
+  A project skill encoding naming, structure and idiom. Cannot be reused from
+  anywhere -- it is the part that is specific to us by definition.
+
+---
+
+id: CAP-120
+label: Format on edit
+kind: hook
+source: own
+status: gap
+note: PostToolUse hook. Per-stack, so it belongs in profiles/ rather than as one hook.
+addresses: [FM-09]
+
+---
+
+id: CAP-121
+label: Lint on edit
+kind: hook
+source: own
+status: gap
+note: As above. Deterministic, therefore a hook and never an instruction.
+addresses: [FM-09]
+
+---
+
+id: CAP-130
+label: Tests run on change
+kind: hook
+source: own
+status: gap
+note: Stop or PostToolUse hook running the affected tests.
+addresses: [FM-09]
+
+---
+
+id: CAP-131
+label: Test generation
+kind: skill
+source: claude-community
+supplier: "community test-generation plugins; or a project skill"
+status: gap
+note: >-
+  Worth surveying the community marketplace before writing one. What is
+  specific to us is the fixture and mocking convention, not the act of
+  generating a test.
+
+---
+
+id: CAP-132
+label: Browser-driven end-to-end testing
+kind: mcp-server
+source: anthropic-official
+supplier: playwright
+status: install
+note: Drives a real browser from natural language. Never rebuild this.
+
+---
+
+id: CAP-133
+label: Coverage gate
+kind: hook
+source: own
+status: gap
+
+---
+
+id: CAP-140
+label: Live frontend debugging
+kind: mcp-server
+source: third-party
+supplier: "Chrome DevTools MCP"
+status: install
+note: >-
+  Gives the agent the real browser's view. Without it, frontend debugging is
+  the agent reasoning about a page it cannot see.
+
+---
+
+id: CAP-141
+label: Production error context
+kind: mcp-server
+source: anthropic-official
+supplier: sentry
+status: install
+note: Pulls the actual stack and breadcrumbs instead of having them pasted in.
+addresses: [FM-01]
+
+---
+
+id: CAP-142
+label: Log and status watching
+kind: monitor
+source: own
+status: gap
+note: >-
+  A plugin can declare monitors/monitors.json to tail a log in the background
+  and notify the session as lines arrive. Nothing to reuse -- the commands are
+  ours. Currently unused and it should not be.
+
+---
+
+id: CAP-143
+label: Reproduction capture
+kind: skill
+source: own
+status: gap
+note: Turn an ad-hoc repro into a committed failing test before fixing anything.
+
+---
+
+id: CAP-150
+label: Issue tracker access
+kind: mcp-server
+source: anthropic-official
+supplier: "linear / atlassian / asana / notion"
+status: install
+
+---
+
+id: CAP-151
+label: Infrastructure state
+kind: mcp-server
+source: anthropic-official
+supplier: "vercel / firebase / supabase"
+status: install
+
+---
+
+id: CAP-152
+label: Runbook execution
+kind: skill
+source: own
+status: gap
+note: >-
+  Encodes a specific operational procedure and what only a human may do in it.
+  Inherently ours; there is nothing generic to install.
+
+---
+
+id: CAP-153
+label: Blast-radius guard
+kind: settings
+source: own
+status: built
+note: The deny and ask permission tiers. What must never happen, stated once.
+addresses: [FM-04]
+
+---
+
+id: CAP-154
+label: Team communication
+kind: mcp-server
+source: anthropic-official
+supplier: slack
+status: install
+
+---
+
+id: CAP-160
+label: Multi-lens change review
+kind: plugin
+source: anthropic-official
+supplier: "pr-review-toolkit; built-in /code-review"
+status: install
+note: Parallel agents each looking for a different class of problem.
+
+---
+
+id: CAP-161
+label: Inline security review
+kind: plugin
+source: anthropic-official
+supplier: security-guidance
+status: install
+note: >-
+  Reviews each change as it is written and fixes what it finds in the same
+  session, rather than at a gate weeks later. Accepts project-specific rules.
+
+---
+
+id: CAP-162
+label: House review checklist
+kind: skill
+source: own
+status: gap
+note: Our standards, not general ones. The generic half is CAP-160's job.
+
+---
+
+id: CAP-170
+label: Commit and pull-request workflow
+kind: plugin
+source: anthropic-official
+supplier: commit-commands
+status: install
+
+---
+
+id: CAP-171
+label: Repository and issue access
+kind: mcp-server
+source: anthropic-official
+supplier: "github / gitlab"
+status: install
+
+---
+
+id: CAP-180
+label: Setup audit
+kind: skill
+source: own
+status: built
+note: rules/ + checks/ + tools/audit.py. The reason this repo exists.
+addresses: [FM-07]
+
+---
+
+id: CAP-181
+label: Usage and cost analytics
+kind: skill
+source: own
+status: built
+note: >-
+  usage_report.py over local transcripts. ccusage is the reusable half for
+  dollar costing; we keep the token and cache analysis because it feeds the
+  rules.
+addresses: [FM-03]
+
+---
+
+id: CAP-182
+label: Output-quality proxy index
+kind: skill
+source: own
+status: built
+note: >-
+  Nobody else builds this. Invented paths, edit mismatches, correction turns,
+  as a trend. Genuinely ours.
+addresses: [FM-01, FM-02]
+
+---
+
+id: CAP-183
+label: Permission tuning
+kind: skill
+source: own
+status: built
+addresses: [FM-04]
+
+---
+
+id: CAP-184
+label: Plugin portfolio hygiene
+kind: skill
+source: own
+status: gap
+note: >-
+  Every installed plugin costs context on every turn, and Claude Code now
+  reports both a per-plugin context cost and a not-used-recently list. Nothing
+  audits that portfolio. Clear gap, and one the official tooling surfaces the
+  data for.
+addresses: [FM-08]
+
+---
+
+id: CAP-185
+label: Trust registry for external artefacts
+kind: skill
+source: own
+status: partial
+note: >-
+  registry/ exists but skewed to analytics. Needs the official marketplace
+  catalogued and a claude-community trust tier distinct from raw third-party.
+addresses: [FM-06]
+
+---
+
+id: CAP-186
+label: Telemetry pipeline
+kind: settings
+source: anthropic-official
+supplier: "OpenTelemetry export"
+status: gap
+note: >-
+  The export is first-party and only needs enabling; the collector config and
+  dashboards are ours. Only source of turn duration and time-to-first-token.
+addresses: [FM-03, FM-10]
+
+---
+
+id: CAP-187
+label: Per-stack setup profiles
+kind: skill
+source: own
+status: gap
+note: >-
+  What turns "you are missing a formatting hook" into a drafted one for this
+  repo's actual toolchain. The single highest-value unbuilt thing here.
+
+---
+
+id: CAP-188
+label: Baseline tracking over time
+kind: skill
+source: own
+status: partial
+note: Analyzers emit JSON; nothing yet stores or diffs it across runs.
+addresses: [FM-03, FM-10]

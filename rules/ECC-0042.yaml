@@ -1,0 +1,38 @@
+id: ECC-0042
+status: active
+since: "0.2.0"
+level: SHOULD
+area: SUP
+applies_to: [any-repo, team]
+
+title: Third-party plugins come from a screened, pinned marketplace
+
+requirement: |-
+  External plugins are installed from the official or community marketplace in
+  preference to an arbitrary git repository. Where a plugin exists only outside
+  those, it is recorded in registry/ with the commit it was reviewed at.
+
+failure_mode: |-
+  Installing straight from a git repository takes whatever is on the default
+  branch at that moment, and takes it again on every update. The community
+  marketplace pins each plugin to a specific commit and screens submissions, so
+  the thing reviewed is the thing installed. Installing from a raw repository
+  gives up both properties while feeling identical to type.
+
+  The difference only becomes visible after a maintainer's account is
+  compromised or a repository changes hands, at which point every machine that
+  auto-updated has already taken the change.
+
+discharges: [CANON-SEC-014]
+check: checks/ecc_0042_marketplace_provenance.py
+signals:
+  - marketplaces configured in settings and their sources
+  - installed plugins whose marketplace is neither official nor community
+  - registry entries lacking a pinned commit for third-party sources
+remediation: |-
+  Add the community marketplace with
+  /plugin marketplace add anthropics/claude-plugins-community and install with
+  @claude-community. For anything outside both catalogs, record the reviewed
+  commit in registry/ and pin to it.
+references:
+  - https://code.claude.com/docs/en/discover-plugins

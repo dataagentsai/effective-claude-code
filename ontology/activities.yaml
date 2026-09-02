@@ -1,0 +1,84 @@
+# Activities -- what people are actually doing when they use Claude Code.
+# Each names the capabilities it needs and the failure modes it is prone to.
+# Multi-document: flat records separated by ---
+
+id: ACT-01
+label: Coding
+phase: build
+description: Writing and changing code in an existing repository.
+needs: [CAP-101, CAP-102, CAP-110, CAP-111, CAP-112, CAP-120, CAP-121]
+exhibits: [FM-01, FM-02, FM-03, FM-09]
+
+---
+
+id: ACT-02
+label: Testing
+phase: build
+description: Writing tests, running them, keeping them green.
+needs: [CAP-130, CAP-131, CAP-132, CAP-133, CAP-110]
+exhibits: [FM-09, FM-03]
+
+---
+
+id: ACT-03
+label: Debugging
+phase: build
+description: Finding why code that was expected to work does not.
+needs: [CAP-101, CAP-140, CAP-142, CAP-143, CAP-102]
+exhibits: [FM-01, FM-02, FM-03]
+
+---
+
+id: ACT-04
+label: Troubleshooting
+phase: operate
+description: Diagnosing a system already running, usually in production, often under time pressure.
+needs: [CAP-141, CAP-150, CAP-151, CAP-152, CAP-153, CAP-154, CAP-142]
+exhibits: [FM-04, FM-01, FM-06]
+
+---
+
+id: ACT-05
+label: Reviewing
+phase: build
+description: Assessing a change before it lands.
+needs: [CAP-160, CAP-161, CAP-162, CAP-102]
+exhibits: [FM-05, FM-09]
+
+---
+
+id: ACT-06
+label: Refactor and migrate
+phase: build
+description: Large mechanical change across many files, where breadth matters more than depth.
+needs: [CAP-101, CAP-102, CAP-111, CAP-120, CAP-130, CAP-133]
+exhibits: [FM-02, FM-03, FM-09]
+
+---
+
+id: ACT-07
+label: Onboarding
+phase: build
+description: A person, or an agent, working in a repository for the first time.
+needs: [CAP-110, CAP-112, CAP-111, CAP-152]
+exhibits: [FM-01, FM-05]
+
+---
+
+id: ACT-08
+label: Releasing
+phase: deliver
+description: Committing, opening pull requests, shipping.
+needs: [CAP-170, CAP-171, CAP-161, CAP-153]
+exhibits: [FM-04, FM-09]
+
+---
+
+id: ACT-09
+label: Operating Claude Code itself
+phase: govern
+description: >-
+  Keeping the setup correct, affordable and reviewable. The activity nobody is
+  assigned, which is why most of the gaps live here.
+needs: [CAP-180, CAP-181, CAP-182, CAP-183, CAP-184, CAP-185, CAP-186, CAP-187, CAP-188]
+exhibits: [FM-03, FM-04, FM-05, FM-06, FM-07, FM-08, FM-10]

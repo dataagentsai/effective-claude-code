@@ -1,0 +1,41 @@
+id: ECC-0043
+status: active
+since: "0.2.0"
+level: SHOULD
+area: ART
+applies_to: [any-repo]
+
+title: The installed plugin set is reviewed for context cost and disuse
+
+requirement: |-
+  Installed plugins are reviewed periodically. Anything not used in weeks is
+  disabled or uninstalled, and anything with a large per-turn context cost earns
+  that cost against actual use.
+
+failure_mode: |-
+  A plugin's tools and skills are announced in the context of every turn,
+  whether or not anyone invokes them. The cost is per-turn, per-session,
+  per-developer, and it never appears as a line item -- it is simply absorbed
+  into the mean context per call, which is already the dominant term in an
+  agentic workload.
+
+  Installation is a single deliberate act; disuse is silent. So portfolios only
+  grow, and the tax compounds against the one number that most needs to come
+  down. The tooling already reports both a per-plugin context cost and a list of
+  plugins unused across at least ten sessions, and almost nobody looks at either.
+
+discharges: [CANON-THINK-006, CANON-PERF-003]
+check: checks/ecc_0043_plugin_portfolio.py
+signals:
+  - enabled plugins in settings versus those invoked in recent transcripts
+  - plugins contributing MCP servers whose tools are not deferred by tool search
+remediation: |-
+  Run /plugin, open the Installed tab, and work the "Not used recently" group.
+  Disable rather than uninstall first if you are unsure -- disabling removes the
+  per-turn cost while keeping the plugin available.
+
+  Exempt by design: plugins contributing a theme, output style, monitor or
+  workflow deliver value without an invocation to count, and language servers
+  count as used when they answer a navigation request.
+references:
+  - https://code.claude.com/docs/en/discover-plugins

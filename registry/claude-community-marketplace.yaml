@@ -1,0 +1,30 @@
+id: reg-claude-community-marketplace
+name: claude-community
+source: https://github.com/anthropics/claude-plugins-community
+trust: community-screened
+category: marketplace
+last_reviewed: "2026-09-02"
+install: "/plugin marketplace add anthropics/claude-plugins-community"
+
+what_it_does: |-
+  Anthropic's public marketplace for third-party plugins that have passed
+  automated validation and safety screening. Install from it as
+  @claude-community.
+
+why_you_would_use_it: |-
+  Two properties a raw git repository does not give you. Each plugin is pinned
+  to a specific commit SHA in the catalog, so the thing that was reviewed is the
+  thing that gets installed. And every submission passes an automated safety
+  screen plus `claude plugin validate` before it lands.
+
+  This is where to look before writing a general-purpose skill. Anything that is
+  not specific to how we work has probably been written already, and taking it
+  from here is materially safer than taking it from a search result.
+
+notes: |-
+  Screened is not read. The screening is automated; it raises the floor, it does
+  not substitute for reading a plugin that will run hooks on your machine
+  (ECC-0041). Prefer this over arbitrary repositories -- ECC-0042.
+
+  The catalog syncs nightly, so there is a delay between approval and a plugin
+  becoming installable.

@@ -1,0 +1,38 @@
+id: ECC-0033
+status: active
+since: "0.2.0"
+level: SHOULD
+area: ART
+applies_to: [any-repo]
+
+title: A language server is installed for the repo's primary language
+
+requirement: |-
+  Repos in a language with an official code-intelligence plugin have it
+  installed, and the language server binary present on PATH.
+
+failure_mode: |-
+  Without a language server the agent navigates by grep and validates by
+  running the build. Both are slower, and grep-based navigation is where
+  invented paths come from -- a plausible-looking path is produced from pattern
+  because looking properly is expensive. With the plugin installed, diagnostics
+  come back after every edit, so a type error or missing import is caught in the
+  same turn instead of at the next build, and definitions are resolved rather
+  than guessed.
+
+  This is the clearest case in the catalog of a quality problem with an install
+  as its fix. Teams reach for a better CLAUDE.md when the actual remedy is to
+  stop making the agent guess.
+
+discharges: [CANON-ARCH-021, CANON-AI-008]
+check: checks/ecc_0033_lsp_installed.py
+signals:
+  - dominant source language by file count
+  - whether a matching *-lsp plugin is enabled
+  - whether the required binary resolves on PATH
+remediation: |-
+  /plugin install <lang>-lsp@claude-plugins-official, then install the binary
+  it needs -- the plugin does not install it for you. Eleven languages are
+  covered officially; other languages can use a custom .lsp.json.
+references:
+  - https://code.claude.com/docs/en/discover-plugins

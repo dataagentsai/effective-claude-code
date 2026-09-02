@@ -119,11 +119,48 @@ def load(text: str) -> dict:
     return out
 
 
+def load_all(text: str) -> list:
+    """Parse a multi-document file: flat records separated by a `---` line.
+
+    The ontology files hold many small records each. One-file-per-record (the
+    rules convention) would mean hundreds of files for data nobody edits one
+    entry at a time, so those use this instead. Each document is still flat --
+    the grammar above is unchanged.
+    """
+    docs, current = [], []
+    for line in text.splitlines():
+        if line.rstrip() == "---":
+            docs.append("\n".join(current))
+            current = []
+        else:
+            current.append(line)
+    docs.append("\n".join(current))
+
+    out = []
+    for doc in docs:
+        if not doc.strip():
+            continue
+        record = load(doc)
+        if record:
+            out.append(record)
+    return out
+
+
 def load_file(path) -> dict:
     import pathlib
 
     p = pathlib.Path(path)
     try:
         return load(p.read_text(encoding="utf-8"))
+    except MinYamlError as exc:
+        raise MinYamlError(f"{p}: {exc}") from exc
+
+
+def load_all_file(path) -> list:
+    import pathlib
+
+    p = pathlib.Path(path)
+    try:
+        return load_all(p.read_text(encoding="utf-8"))
     except MinYamlError as exc:
         raise MinYamlError(f"{p}: {exc}") from exc
