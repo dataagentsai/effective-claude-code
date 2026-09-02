@@ -157,6 +157,41 @@ def show_signal(signal, caps, fms):
         print()
 
 
+def show_kind(kind, acts, caps):
+    """Which artefacts of one type should exist, and for whose benefit.
+
+    Answers the question people actually ask -- 'what skills should we have?' --
+    which the graph holds but does not otherwise present as a list.
+    """
+    wanted = [c for c in caps.values() if c.get("kind") == kind]
+    if not wanted:
+        kinds = sorted({c.get("kind", "?") for c in caps.values()})
+        print(f"\n  No capabilities of kind '{kind}'.\n  Known kinds:\n")
+        for k in kinds:
+            n = sum(1 for c in caps.values() if c.get("kind") == k)
+            print(f"    {k:<14} {n}")
+        print()
+        return
+
+    serves: dict[str, list] = {}
+    for a in acts:
+        for cid in a.get("needs") or []:
+            serves.setdefault(cid, []).append(a["label"])
+
+    print(f"\n  ARTEFACTS OF KIND: {kind}\n  {LEGEND}\n")
+    for c in sorted(wanted, key=lambda c: (STATUS_RANK[c.get("status", "gap")], c["id"])):
+        who = serves.get(c["id"], [])
+        print(f"  {MARK.get(c.get('status'), '[?]')} {c['id']}  {c['label']}")
+        print(f"        source   {c.get('source','?')}" + (f" · {c['supplier']}" if c.get("supplier") else ""))
+        print(f"        serves   {', '.join(who) if who else '-'}")
+        note = (c.get("note") or "").strip().replace("\n", " ")
+        if note:
+            for chunk in _wrap(note, 82):
+                print(f"        {chunk}")
+        print()
+    print("  How to choose between kinds: playbooks/choosing-artefacts.md\n")
+
+
 def show_summary(caps):
     by_source: dict[str, int] = {}
     by_status: dict[str, int] = {}
@@ -192,6 +227,11 @@ def main() -> int:
     ap.add_argument("--activity", help="restrict to one activity id, e.g. ACT-03")
     ap.add_argument("--gaps", action="store_true", help="the build list, ranked")
     ap.add_argument("--signal", help="diagnose from an observable, e.g. invented_path")
+    ap.add_argument(
+        "--kind",
+        help="list capabilities of one artefact kind: skill, hook, command, "
+        "mcp-server, lsp-server, monitor, plugin, settings, claude-md",
+    )
     ap.add_argument("--json", metavar="PATH", help="write the whole graph as JSON")
     args = ap.parse_args()
 
@@ -204,7 +244,9 @@ def main() -> int:
             print(f"    {p}", file=sys.stderr)
         print(file=sys.stderr)
 
-    if args.signal:
+    if args.kind:
+        show_kind(args.kind, acts, caps)
+    elif args.signal:
         show_signal(args.signal, caps, fms)
     elif args.gaps:
         show_gaps(acts, caps)
