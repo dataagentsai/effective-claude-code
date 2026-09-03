@@ -1,0 +1,475 @@
+# Linter and static-analysis registry.
+#
+# Multi-document, flat records. Read by tools/detect_stack.py, which proposes
+# ONLY the entries a repo actually declares -- never a template.
+#
+# kind:   lint | format | type | security | deps | dead-code | complexity | platform
+# speed:  fast (<2s, safe in a PostToolUse hook) | slow (Stop hook or CI only)
+# hook:   posttooluse | stop | ci
+#
+# The speed field is the one that matters. A slow checker in a PostToolUse hook
+# runs after every single edit and makes the session feel broken, so it gets
+# removed along with the fast checks that were earning their keep.
+
+# ============================================================ PYTHON
+
+id: ruff
+name: Ruff
+lang: python
+kind: lint
+speed: fast
+hook: posttooluse
+install: pip install ruff
+command: ruff check --quiet
+fix_command: ruff check --fix
+detect: [pyproject.toml:tool.ruff, ruff.toml, .ruff.toml]
+notes: >-
+  Subsumes flake8, isort, pyupgrade, pydocstyle and much of pylint in one Rust
+  binary, fast enough to run on every edit. If a repo has ruff, it usually does
+  not also need flake8 or isort, and running all three is duplicated work.
+
+---
+
+id: ruff-format
+name: Ruff format
+lang: python
+kind: format
+speed: fast
+hook: posttooluse
+install: pip install ruff
+command: ruff format --check
+fix_command: ruff format
+detect: [pyproject.toml:tool.ruff, ruff.toml]
+notes: Black-compatible. Do not run alongside black; they will fight.
+
+---
+
+id: black
+name: Black
+lang: python
+kind: format
+speed: fast
+hook: posttooluse
+install: pip install black
+command: black --check
+fix_command: black
+detect: [pyproject.toml:tool.black]
+
+---
+
+id: isort
+name: isort
+lang: python
+kind: format
+speed: fast
+hook: posttooluse
+install: pip install isort
+command: isort --check-only
+fix_command: isort
+detect: [pyproject.toml:tool.isort, .isort.cfg, setup.cfg:isort]
+notes: Redundant if ruff is configured with the I rules enabled.
+
+---
+
+id: flake8
+name: Flake8
+lang: python
+kind: lint
+speed: fast
+hook: posttooluse
+install: pip install flake8
+command: flake8
+detect: [.flake8, setup.cfg:flake8, tox.ini:flake8]
+notes: >-
+  Plugin ecosystem worth knowing: flake8-bugbear (real bugs),
+  flake8-comprehensions, flake8-simplify, flake8-annotations. Mostly superseded
+  by ruff, which reimplements the popular ones.
+
+---
+
+id: pylint
+name: Pylint
+lang: python
+kind: lint
+speed: slow
+hook: stop
+install: pip install pylint
+command: pylint
+detect: [.pylintrc, pyproject.toml:tool.pylint, pylintrc]
+notes: >-
+  Deeper than ruff and much slower -- it imports your code. Stop hook or CI, not
+  per-edit. Its real advantage is the plugin API, which is how the Databricks
+  checks below exist at all.
+
+---
+
+id: mypy
+name: mypy
+lang: python
+kind: type
+speed: slow
+hook: stop
+install: pip install mypy
+command: mypy
+detect: [mypy.ini, .mypy.ini, pyproject.toml:tool.mypy, setup.cfg:mypy]
+
+---
+
+id: pyright
+name: Pyright
+lang: python
+kind: type
+speed: slow
+hook: stop
+install: npm i -g pyright
+command: pyright
+detect: [pyrightconfig.json, pyproject.toml:tool.pyright]
+notes: >-
+  Also the language server behind the pyright-lsp plugin. Installing that plugin
+  gives Claude the same diagnostics inline after every edit, which is strictly
+  better than waiting for a hook (ECC-0033).
+
+---
+
+id: bandit
+name: Bandit
+lang: python
+kind: security
+speed: fast
+hook: stop
+install: pip install bandit
+command: bandit -r -q
+detect: [.bandit, pyproject.toml:tool.bandit]
+
+---
+
+id: pip-audit
+name: pip-audit
+lang: python
+kind: deps
+speed: slow
+hook: ci
+install: pip install pip-audit
+command: pip-audit
+detect: [poetry.lock, uv.lock, requirements.lock]
+notes: >-
+  Detects on a lock file, not on pyproject.toml. Every Python repo has a
+  pyproject, so detecting on it would report pip-audit as "configured"
+  everywhere and make the configured list meaningless.
+
+  Needs network. CI only on a locked-down laptop.
+
+---
+
+id: vulture
+name: Vulture
+lang: python
+kind: dead-code
+speed: fast
+hook: ci
+install: pip install vulture
+command: vulture
+detect: [pyproject.toml:tool.vulture]
+
+---
+
+id: xenon
+name: Radon / Xenon
+lang: python
+kind: complexity
+speed: fast
+hook: ci
+install: pip install xenon
+command: xenon --max-absolute B
+detect: [pyproject.toml:tool.radon]
+
+# ============================================================ PYSPARK
+
+id: databricks-labs-pylint
+name: Databricks Labs PyLint plugin
+lang: pyspark
+kind: lint
+speed: slow
+hook: stop
+install: pip install databricks-labs-pylint
+command: pylint --load-plugins=databricks.labs.pylint.all
+detect: [pyproject.toml:tool.pylint, .pylintrc]
+notes: >-
+  The one genuinely PySpark-aware linter in wide use. Catches Databricks-specific
+  patterns rather than generic Python smells: using `spark` from outside a
+  function (which makes the code untestable, since there is no way to inject a
+  session), display() where show() belongs, databricks_cli usage that should be
+  databricks.sdk, and Unity Catalog incompatibilities.
+
+  `databricks labs pylint-plugin nbcheck` checks notebooks or whole directories,
+  which plain pylint cannot do.
+
+---
+
+id: sqlfluff-embedded
+name: sqlfluff over embedded Spark SQL
+lang: pyspark
+kind: lint
+speed: slow
+hook: ci
+install: pip install sqlfluff
+command: sqlfluff lint --dialect sparksql
+detect: [.sqlfluff]
+notes: >-
+  SQL inside spark.sql("...") is invisible to every Python linter. Extracting it
+  and linting with the sparksql or databricks dialect is the only way to catch
+  it. Requires a small extraction step; nothing off-the-shelf does this.
+
+---
+
+id: pyspark-static-gap
+name: General PySpark static analysis
+lang: pyspark
+kind: lint
+speed: slow
+hook: ci
+install: "-- no mainstream tool --"
+command: "-- none --"
+detect: []
+notes: >-
+  HONEST GAP. Beyond the Databricks plugin there is no widely used PySpark
+  linter. Nothing standard catches a shuffle-inducing join order, a UDF where a
+  built-in exists, collect() on an unbounded frame, a missing broadcast hint, or
+  a partition-count antipattern. Teams that care write AST rules themselves.
+
+  Do not expect to install your way out of this one.
+
+# ============================================================ SQL
+
+id: sqlfluff
+name: SQLFluff
+lang: sql
+kind: lint
+speed: slow
+hook: stop
+install: pip install sqlfluff
+command: sqlfluff lint
+fix_command: sqlfluff fix
+detect: [.sqlfluff, pyproject.toml:tool.sqlfluff, setup.cfg:sqlfluff]
+notes: >-
+  The main SQL linter and formatter, and dialect-aware, which matters more than
+  anything else here. Dialects include sparksql, databricks, bigquery,
+  snowflake, postgres, tsql, duckdb, redshift, athena. Linting Databricks SQL as
+  ansi produces a stream of false errors, so set the dialect first.
+
+  With dbt, add sqlfluff-templater-dbt so Jinja is rendered before linting.
+
+---
+
+id: sqlglot
+name: SQLGlot
+lang: sql
+kind: lint
+speed: fast
+hook: ci
+install: pip install sqlglot
+command: "-- library, not a CLI --"
+detect: []
+notes: >-
+  A parser and transpiler rather than a linter. Use it to write checks nothing
+  off-the-shelf offers -- unqualified columns, cross-dialect compatibility,
+  banned constructs -- or to transpile between dialects. This is the practical
+  route to custom SQL rules.
+
+---
+
+id: dbt-checkpoint
+name: dbt-checkpoint
+lang: sql
+kind: lint
+speed: slow
+hook: ci
+install: pip install dbt-checkpoint
+command: "pre-commit run --all-files"
+detect: [dbt_project.yml]
+notes: dbt-specific: model documentation, tests present, naming, source freshness.
+
+# ============================================================ JS / TS / NEXT.JS
+
+id: eslint
+name: ESLint
+lang: nextjs
+kind: lint
+speed: fast
+hook: posttooluse
+install: npm i -D eslint
+command: npx eslint
+fix_command: npx eslint --fix
+detect: [eslint.config.js, eslint.config.mjs, .eslintrc.json, .eslintrc.js, package.json:eslintConfig]
+notes: >-
+  Next.js ships eslint-config-next, which carries the framework rules that
+  matter: next/no-img-element, next/no-html-link-for-pages, the hooks rules, and
+  Core Web Vitals checks under next/core-web-vitals. A Next repo without it is
+  missing framework-specific correctness checks, not just style.
+
+---
+
+id: biome
+name: Biome
+lang: nextjs
+kind: lint
+speed: fast
+hook: posttooluse
+install: npm i -D @biomejs/biome
+command: npx biome check
+fix_command: npx biome check --write
+detect: [biome.json, biome.jsonc]
+notes: >-
+  Lint and format in one Rust binary, fast enough to be unnoticeable per edit.
+  Replaces ESLint plus Prettier for many teams. It does not carry the Next.js
+  framework rules, so a Next app usually wants eslint-config-next alongside it.
+
+---
+
+id: oxlint
+name: Oxlint
+lang: nextjs
+kind: lint
+speed: fast
+hook: posttooluse
+install: npm i -D oxlint
+command: npx oxlint
+detect: [.oxlintrc.json]
+notes: Very fast, narrower rule set. Often run as a first pass before ESLint.
+
+---
+
+id: prettier
+name: Prettier
+lang: nextjs
+kind: format
+speed: fast
+hook: posttooluse
+install: npm i -D prettier
+command: npx prettier --check .
+fix_command: npx prettier --write .
+detect: [.prettierrc, .prettierrc.json, prettier.config.js, package.json:prettier]
+
+---
+
+id: tsc
+name: TypeScript compiler
+lang: nextjs
+kind: type
+speed: slow
+hook: stop
+install: npm i -D typescript
+command: npx tsc --noEmit
+detect: [tsconfig.json]
+notes: >-
+  The highest-value check in a TS repo and the one most often missing from
+  hooks, because `next build` type-checks and people assume that is enough --
+  but nobody runs a build after every edit. Installing typescript-lsp gives
+  Claude the same errors inline, which is better still.
+
+---
+
+id: stylelint
+name: Stylelint
+lang: nextjs
+kind: lint
+speed: fast
+hook: posttooluse
+install: npm i -D stylelint
+command: npx stylelint "**/*.{css,scss}"
+detect: [.stylelintrc, .stylelintrc.json, stylelint.config.js]
+
+---
+
+id: knip
+name: Knip
+lang: nextjs
+kind: dead-code
+speed: slow
+hook: ci
+install: npm i -D knip
+command: npx knip
+detect: [knip.json, knip.jsonc, package.json:knip]
+notes: >-
+  Unused files, exports and dependencies. Particularly useful after an agent
+  refactor, which tends to leave orphans behind.
+
+---
+
+id: depcheck
+name: depcheck
+lang: nextjs
+kind: deps
+speed: slow
+hook: ci
+install: npm i -D depcheck
+command: npx depcheck
+detect: [package-lock.json, pnpm-lock.yaml, yarn.lock]
+
+---
+
+id: npm-audit
+name: npm audit
+lang: nextjs
+kind: deps
+speed: slow
+hook: ci
+install: "-- bundled --"
+command: npm audit --audit-level=high
+detect: [package-lock.json, pnpm-lock.yaml, yarn.lock]
+
+# ============================================================ SONAR
+
+id: sonarqube-claude-plugin
+name: SonarQube plugin for Claude Code
+lang: any
+kind: platform
+speed: slow
+hook: stop
+install: "sonar integrate claude  (needs sonarqube-cli)"
+command: "-- via MCP tools and slash commands --"
+detect: [sonar-project.properties, .sonarcloud.properties]
+notes: >-
+  An official Sonar-built Claude Code plugin plus an MCP server, so issues and
+  quality-gate status arrive in the session instead of in a browser tab. Adds
+  slash commands for quality gate status, listing issues and driving fixes, and
+  can close the loop: write, scan, self-correct.
+
+  It also blocks the agent from reading files containing hardcoded credentials,
+  which is a real safety property independent of the linting.
+
+  Connecting to a self-hosted Server needs a **user** token -- project, global
+  and scoped organization tokens do not work.
+
+---
+
+id: sonar-scanner
+name: SonarScanner CLI
+lang: any
+kind: platform
+speed: slow
+hook: ci
+install: "download sonar-scanner, or SonarSource/sonarqube-scan-action in CI"
+command: sonar-scanner
+detect: [sonar-project.properties]
+notes: >-
+  The batch path. Analyses Python, JS/TS, and SQL dialects (PL/SQL and T-SQL;
+  ANSI and Spark SQL coverage is weaker than sqlfluff's). Server-side rules and
+  quality gates, so it complements local linters rather than replacing them --
+  and it is far too slow for a per-edit hook.
+
+---
+
+id: sonarqube-for-ide
+name: SonarQube for IDE
+lang: any
+kind: platform
+speed: fast
+hook: ci
+install: "IDE extension marketplace"
+command: "-- IDE only --"
+detect: []
+notes: >-
+  Formerly SonarLint. Editor-side, in connected mode it pulls rules from your
+  Server or Cloud project. Relevant here only because it is what the humans see;
+  Claude sees the MCP server instead.
